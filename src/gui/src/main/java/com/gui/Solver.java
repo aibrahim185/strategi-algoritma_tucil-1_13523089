@@ -9,6 +9,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
+
+import javax.imageio.ImageIO;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -17,6 +21,7 @@ import javafx.geometry.VPos;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.image.WritableImage;
 import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -24,6 +29,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
@@ -40,6 +46,8 @@ public class Solver {
     private TextField PField;
     @FXML 
     private Label ErrorField;
+    @FXML 
+    private Label Announcement;
     @FXML
     private Canvas Image; 
     @FXML
@@ -341,7 +349,7 @@ public class Solver {
         return false;
     }
     
-    private void drawMatrixOnCanvas(Canvas canvas, char[][] board) {
+    private void createImage(Canvas canvas, char[][] board) {
         GraphicsContext gc = canvas.getGraphicsContext2D();
         int cellSize = 50;
         int width = board[0].length * cellSize;
@@ -392,6 +400,29 @@ public class Solver {
             }
         }
     }
+
+    private void saveImage(Canvas canvas, String filename) {
+        WritableImage writableImage = new WritableImage((int) canvas.getWidth(), (int) canvas.getHeight());
+        canvas.snapshot(new SnapshotParameters(), writableImage);
+
+        int width = (int) canvas.getWidth();
+        int height = (int) canvas.getHeight();
+        BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+
+        int[] buffer = new int[width * height];
+        writableImage.getPixelReader().getPixels(0, 0, width, height, javafx.scene.image.PixelFormat.getIntArgbInstance(), buffer, 0, width);
+
+        int[] data = ((DataBufferInt) bufferedImage.getRaster().getDataBuffer()).getData();
+        System.arraycopy(buffer, 0, data, 0, buffer.length);
+
+        File file = new File(filename);
+        try {
+            ImageIO.write(bufferedImage, "png", file);
+            System.out.println("Gambar berhasil disimpan: " + file.getAbsolutePath());
+        } catch (IOException e) {
+            System.out.println("Gagal menyimpan gambar: " + e.getMessage());
+        }
+    }
     
     @FXML 
     private void driver() {
@@ -407,9 +438,10 @@ public class Solver {
             long duration = endTime - startTime;
     
             if (isSolved) {
-                SaveButton.setVisible(true);
+                SaveButton.setDisable(false);
                 printBoard(board);
-                drawMatrixOnCanvas(Image, board);
+                createImage(Image, board);
+                Announcement.setText("Waktu pencarian: " + duration + " ms || Banyak kasus yang ditinjau: " + totalIterations);
             } else {
                 System.out.println("Tidak ada solusi.");
             }
@@ -424,7 +456,8 @@ public class Solver {
 
     @FXML
     private void inputFile() {
-        SaveButton.setVisible(false);   
+        SaveButton.setDisable(true);   
+        
         fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text Files", "*.txt"));
         File inputFile = fc.showOpenDialog(new Stage());
         if (inputFile != null) {
@@ -485,10 +518,18 @@ public class Solver {
             "DEFAULT", "CUSTOM"
         );
         CaseField.setItems(caseOptions);
-        CaseField.setValue("DEFAULT");
+        CaseField.setValue("CUSTOM");
     
-        CustomField.setVisible(false);
-        SaveButton.setVisible(false);
+        Announcement.setText("");
+        ErrorField.setText("");
+        SaveButton.setDisable(true);
+
+        SaveButton.setOnAction(e -> {
+            File outputFile = fc.showSaveDialog(new Stage());
+            if (outputFile != null) {
+                saveImage(Image, outputFile.getAbsolutePath());
+            }
+        });
     
         CaseField.setOnAction(e -> {
             String selectedCase = CaseField.getValue();
