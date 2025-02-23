@@ -149,16 +149,15 @@ public class Solver {
 
             
             String[] piecesData = PiecesField.getText().split("\n");
-            List<int[]> shapeList = new ArrayList<>();
             int area = 0;
             int idx = 0;
             for (int i = 0; i < P; i++) {
-                String line = piecesData[idx];
+                List<int[]> shapeList = new ArrayList<>();
 
                 char symbol = (char) (i + 'A');
-                for (int j = 0; j < line.length(); j++) {
-                    if (line.charAt(j) >= 'A' && line.charAt(j) <= 'Z') {
-                        symbol = line.charAt(j);
+                for (int j = 0; j < piecesData[idx].length(); j++) {
+                    if (piecesData[idx].charAt(j) >= 'A' && piecesData[idx].charAt(j) <= 'Z') {
+                        symbol = piecesData[idx].charAt(j);
                         break;
                     }
                 }
@@ -168,20 +167,20 @@ public class Solver {
                 do {
                     boolean isFirst = true;
 
-                    for (int col = 0; col < line.length(); col++) {
-                        if (line.charAt(col) == symbol) {
+                    for (int col = 0; col < piecesData[idx].length(); col++) {
+                        if (piecesData[idx].charAt(col) == symbol) {
                             isFirst = false;
                             shapeList.add(new int[]{row, col});
                             area++;
-                        } else if (line.charAt(col) >= 'A' && line.charAt(col) <= 'Z' && isFirst) {
+                        } else if (piecesData[idx].charAt(col) >= 'A' && piecesData[idx].charAt(col) <= 'Z' && isFirst) {
                             break readPiece;
-                        } else if (line.charAt(col) != ' ') {
+                        } else if (piecesData[idx].charAt(col) != ' ') {
                             ErrorField.setText("Karakter tidak valid.");
                             return false;
                         } 
                     }
                     row++;
-                } while (idx++ < piecesData.length);
+                } while (++idx < piecesData.length);
 
                 int[][] shape = shapeList.toArray(new int[0][]);
                 pieces.add(new Piece(symbol, shape));
@@ -289,6 +288,48 @@ public class Solver {
         return true;
     }
     
+    private static boolean solve() {
+        int[] perm = new int[P];
+        
+        do {
+            boolean[][][] visited = new boolean[P][N][M];
+            
+            for (int r = 0; r < N; r++) {
+                for (int c = 0; c < M; c++) {
+                    char[][] tempBoard = Arrays.stream(board).map(char[]::clone).toArray(char[][]::new);
+
+                    totalIterations++;
+                    
+                    for (int i = 0; i < P; i++) {
+                        for (int row = 0; row < N; row++) {
+                            boolean isPlaced = false;
+                            
+                            for (int col = 0; col < M; col++) {
+                                Piece newPiece = pieces.get(i).transform(perm[i]);
+                                if (!visited[i][row][col] && !place(tempBoard, newPiece, row, col)) {
+                                    removePiece(tempBoard, newPiece, row, col);
+                                } else {
+                                    visited[i][row][col] = true;
+                                    isPlaced = true;
+                                    break;
+                                }
+                            }
+
+                            if (isPlaced) break;
+                        }
+                    }
+                    
+                    if (check(tempBoard)) {
+                        board = tempBoard;
+                        return true;
+                    }
+                }
+            }
+        } while (nextTransformation(perm));
+
+        return false;
+    }
+    
     @FXML 
     private void driver() {
         N = Integer.parseInt(NField.getText());
@@ -296,6 +337,25 @@ public class Solver {
         P = Integer.parseInt(PField.getText());
 
         if (parse()) {
+            System.out.println("Start\n");
+            long startTime = System.currentTimeMillis();
+            boolean isSolved = solve();
+            long endTime = System.currentTimeMillis();
+            long duration = endTime - startTime;
+
+            if (isSolved) {
+                printBoard(board);
+            } else {
+                printBoard(board);
+                System.out.println("Tidak ada solusi.");
+            }
+
+            System.out.println("\nWaktu pencarian: " + duration + " ms");
+            System.out.println("\nBanyak kasus yang ditinjau: " + totalIterations);
+            System.out.println("\nApakah anda ingin menyimpan solusi? (ya/tidak) ");
+            totalIterations = 0;
+        } else {
+            System.out.println("error");
         }
     }
 
@@ -329,6 +389,11 @@ public class Solver {
                         }
                         CaseField.setValue("CUSTOM");
                         CustomField.setText(customBoard.toString());
+                    } else if (caseType.equals("DEFAULT")) {
+                        CaseField.setValue("DEFAULT");
+                    } else {
+                        ErrorField.setText("Case tidak valid.");
+                        return;
                     }
                 }
                 

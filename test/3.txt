@@ -10,7 +10,7 @@ AAA
 BB
 BBB
 CCCC
-   C
+ C
 D
 EEE
 E
