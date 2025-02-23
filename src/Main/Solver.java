@@ -1,7 +1,6 @@
 package Main;
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -109,7 +108,6 @@ public class Solver {
                             boolean isPlaced = false;
                             
                             for (int col = 0; col < M; col++) {
-                                // Piece newPiece = pieces.get(i).transform(perm.get(i));
                                 Piece newPiece = pieces.get(i).transform(perm[i]);
                                 if (!visited[i][row][col] && !place(tempBoard, newPiece, row, col)) {
                                     removePiece(tempBoard, newPiece, row, col);
@@ -130,8 +128,6 @@ public class Solver {
                     }
                 }
             }
-            // printBoard(tempBoard);
-            // System.out.println();
         } while (nextTransformation(perm));
 
         return false;
@@ -232,9 +228,6 @@ public class Solver {
                 totalArea = 0;
                 for (int i = 0; i < N; i++) {
                     String line = br.readLine();
-                    // if (line == null) {
-                    //     throw new IllegalArgumentException("Expected board data but found EOF");
-                    // }
 
                     for (int j = 0; j < M; j++) {
                         if (line.charAt(j) == 'X') {
@@ -293,10 +286,6 @@ public class Solver {
                 return false;
             }
             return true;
-        } catch (IOException e) {
-            System.err.println("Error reading file: " + e.getMessage());
-        } catch (IllegalArgumentException e) {
-            System.err.println("Input error: " + e.getMessage());
         } catch (Exception e) {
             System.err.println("error: " + e.getMessage());
         }
@@ -318,27 +307,6 @@ public class Solver {
             printBoard(board);
             System.out.println("Tidak ada solusi.");
         }
-
-        // for (int i = 0; i < 8; i++) {
-        //     char[][] tempBoard = new char[2 * N][2 * M];
-        //     Piece newPiece = pieces.get(0).transform(i);
-
-        //     for (int row = 0; row < 2 * N; row++) {
-        //         Arrays.fill(tempBoard[row], PADDING);
-        //     }
-
-        //     for (int[] coord : newPiece.shape) {
-        //         tempBoard[coord[0] + N][coord[1] + M] = newPiece.symbol;
-        //     }
-            
-        //     for (int row = 0; row < 2 * N; row++) {
-        //         for (int col = 0; col < 2 * M; col++) {
-        //             System.out.print(tempBoard[row][col]);
-        //         }
-        //         System.out.println();
-        //     }
-        //     System.out.println();
-        // }
 
         System.out.println("\nWaktu pencarian: " + duration + " ms");
         System.out.println("\nBanyak kasus yang ditinjau: " + totalIterations);
