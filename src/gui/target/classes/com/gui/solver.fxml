@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" spacing="20.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.gui.Solver">
+    <children>
+      <BorderPane prefHeight="644.0" prefWidth="900.0">
+         <top>
+            <VBox alignment="CENTER" prefHeight="69.0" prefWidth="900.0" BorderPane.alignment="CENTER">
+               <children>
+                  <VBox alignment="CENTER" prefHeight="73.0" prefWidth="900.0">
+                     <children>
+                        <Separator prefWidth="200.0" />
+                        <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@images/istockphoto-1496515143-612x612.jpg" />
+                                 </image>
+                              </ImageView>
+                              <Label alignment="CENTER" text="IQ PUZZLER PRO SOLVER" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Monospaced Regular" size="32.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets left="10.0" right="10.0" />
+                                 </HBox.margin>
+                              </Label>
+                              <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@images/istockphoto-1496515143-612x612.jpg" />
+                                 </image>
+                              </ImageView>
+                           </children>
+                        </HBox>
+                     </children>
+                     <VBox.margin>
+                        <Insets top="10.0" />
+                     </VBox.margin>
+                  </VBox>
+               </children>
+            </VBox>
+         </top>
+         <center>
+            <VBox alignment="CENTER" prefHeight="513.0" prefWidth="880.0" spacing="10.0" BorderPane.alignment="CENTER">
+               <children>
+                  <Separator prefWidth="200.0" />
+                  <HBox alignment="CENTER" centerShape="false" prefHeight="267.0" prefWidth="858.0">
+                     <children>
+                        <VBox alignment="CENTER" prefHeight="234.0" prefWidth="510.0">
+                           <children>
+                              <ImageView fx:id="afterImage1" fitHeight="226.0" fitWidth="199.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@images/Brute_Force_Coverart.png" />
+                                 </image>
+                              </ImageView>
+                           </children>
+                        </VBox>
+                        <Separator orientation="VERTICAL" prefHeight="200.0" />
+                        <VBox alignment="CENTER" prefHeight="234.0" prefWidth="510.0">
+                           <children>
+                              <ImageView fx:id="Image" fitHeight="226.0" fitWidth="483.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../../../../../../test/image/hasil3.jpg" />
+                                 </image></ImageView>
+                              <Label fx:id="ErrorField" alignment="CENTER" textAlignment="CENTER" textFill="RED">
+                                 <font>
+                                    <Font name="Monospaced Regular" size="14.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </VBox>
+                        <Separator orientation="VERTICAL" prefHeight="200.0" />
+                        <VBox alignment="CENTER" prefHeight="234.0" prefWidth="510.0">
+                           <children>
+                              <ImageView fx:id="afterImage11" fitHeight="245.0" fitWidth="162.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@images/stock-photo-big-brain-concept-244905064.jpg" />
+                                 </image>
+                              </ImageView>
+                           </children>
+                        </VBox>
+                     </children>
+                  </HBox>
+                  <Separator prefWidth="200.0" />
+                  <HBox alignment="CENTER" prefHeight="34.0" prefWidth="200.0" spacing="10.0">
+                     <children>
+                        <ComboBox fx:id="CaseField" prefWidth="150.0" promptText="DEFAULT" visibleRowCount="2" />
+                        <Label text="N:" />
+                        <TextField fx:id="NField" prefHeight="26.0" prefWidth="60.0" promptText="5" text="5" />
+                        <Label text="M:" />
+                        <TextField fx:id="MField" prefHeight="26.0" prefWidth="60.0" promptText="5" text="5" />
+                        <Label text="P:" />
+                        <TextField fx:id="PField" prefHeight="26.0" prefWidth="60.0" promptText="7" text="7" />
+                        <Button fx:id="SolveButton" mnemonicParsing="false" onAction="#driver" text="BRUTE FORCE!!!">
+                           <font>
+                              <Font name="Monospaced Regular" size="12.0" />
+                           </font>
+                        </Button>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER" prefHeight="97.0" prefWidth="860.0" spacing="10.0">
+                     <children>
+                        <TextArea fx:id="CustomField" prefHeight="76.0" prefWidth="128.0" text="...X...&#10;.XXXXX.&#10;XXXXXXX&#10;.XXXXX.&#10;...X...">
+                           <font>
+                              <Font name="Monospaced Regular" size="12.0" />
+                           </font>
+                        </TextArea>
+                        <TextArea fx:id="PiecesField" prefHeight="97.0" prefWidth="452.0" text="A&#10;AA&#10;B&#10;BB&#10;C&#10;CC&#10;D&#10;DD&#10;EE&#10;EE&#10;E&#10;FF&#10;FF&#10;F&#10;GGG">
+                           <font>
+                              <Font name="Monospaced Regular" size="12.0" />
+                           </font></TextArea>
+                        <Separator orientation="VERTICAL" prefHeight="200.0" />
+                        <Label text="File:" />
+                        <Button fx:id="InputButton" mnemonicParsing="false" onAction="#inputFile" text="Input" />
+                     </children>
+                  </HBox>
+               </children>
+               <BorderPane.margin>
+                  <Insets bottom="10.0" left="10.0" right="10.0" />
+               </BorderPane.margin>
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" />
+               </padding>
+            </VBox>
+         </center>
+      </BorderPane>
+      <Separator prefHeight="49.0" prefWidth="900.0" />
+    </children>
+</VBox>
