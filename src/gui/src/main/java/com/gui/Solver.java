@@ -59,8 +59,6 @@ public class Solver {
     @FXML
     private Button SaveButton;
     
-    FileChooser fc = new FileChooser();
-
     private static int N, M, P;
     private static final char EMPTY = '_';
     private static final char PADDING = '.';
@@ -68,6 +66,7 @@ public class Solver {
     private static final List<Piece> pieces = new ArrayList<>();
 
     private static int totalIterations = 0;
+    private static long duration = 0;
 
     static class Piece {
         char symbol;
@@ -415,12 +414,41 @@ public class Solver {
         int[] data = ((DataBufferInt) bufferedImage.getRaster().getDataBuffer()).getData();
         System.arraycopy(buffer, 0, data, 0, buffer.length);
 
-        File file = new File(filename);
+        File file = new File(filename + ".png");
         try {
             ImageIO.write(bufferedImage, "png", file);
             System.out.println("Gambar berhasil disimpan: " + file.getAbsolutePath());
         } catch (IOException e) {
             System.out.println("Gagal menyimpan gambar: " + e.getMessage());
+        }
+    }
+
+    private void saveTxt(String filename) {
+        try {
+            File file = new File(filename + ".txt");
+            if (file.createNewFile()) {
+                System.out.println("File berhasil dibuat: " + file.getName());
+            } else {
+                System.out.println("File sudah ada.");
+            }
+
+            StringBuilder sb = new StringBuilder();
+            for (char[] row : board) {
+                for (char cell : row) {
+                    sb.append(cell);
+                }
+                sb.append("\n");
+            }
+
+            sb.append("\nWaktu pencarian: " + duration + " ms");
+            sb.append("\nBanyak kasus yang ditinjau: " + totalIterations);
+
+            java.io.FileWriter w = new java.io.FileWriter(file);
+            w.write(sb.toString());
+            w.close();
+            System.out.println("Berhasil menyimpan file: " + file.getAbsolutePath());
+        } catch (IOException e) {
+            System.out.println("Gagal menyimpan file: " + e.getMessage());
         }
     }
     
@@ -436,11 +464,12 @@ public class Solver {
     
         if (parse()) {
             System.out.println("Start\n");
+            totalIterations = 0;
 
             long startTime = System.currentTimeMillis();
             boolean isSolved = solve();
             long endTime = System.currentTimeMillis();
-            long duration = endTime - startTime;
+            duration = endTime - startTime;
     
             if (isSolved) {
                 SaveButton.setDisable(false);
@@ -455,7 +484,6 @@ public class Solver {
             
             System.out.println("\nWaktu pencarian: " + duration + " ms");
             System.out.println("\nBanyak kasus yang ditinjau: " + totalIterations);
-            totalIterations = 0;
         } else {
             Image.getGraphicsContext2D().clearRect(0, 0, Image.getWidth(), Image.getHeight());
             System.out.println("error");
@@ -465,6 +493,8 @@ public class Solver {
     @FXML
     private void inputFile() {
         SaveButton.setDisable(true);   
+
+        FileChooser fc = new FileChooser();
         
         fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text Files", "*.txt"));
         File inputFile = fc.showOpenDialog(new Stage());
@@ -533,9 +563,12 @@ public class Solver {
         SaveButton.setDisable(true);
 
         SaveButton.setOnAction(e -> {
+            FileChooser fc = new FileChooser();
+
             File outputFile = fc.showSaveDialog(new Stage());
             if (outputFile != null) {
                 saveImage(Image, outputFile.getAbsolutePath());
+                saveTxt(outputFile.getAbsolutePath());
             }
         });
     

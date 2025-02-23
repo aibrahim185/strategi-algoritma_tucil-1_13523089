@@ -74,14 +74,18 @@
                         <VBox alignment="CENTER" prefHeight="234.0" prefWidth="510.0">
                            <children>
                               <Canvas fx:id="Image" height="200.0" width="515.0" />
-                              <Label fx:id="ErrorField" alignment="CENTER" text="error" textAlignment="CENTER" textFill="RED">
-                                 <font>
-                                    <Font name="Monospaced Regular" size="14.0" />
-                                 </font>
-                              </Label>
                               <ScrollPane prefHeight="31.0" prefWidth="515.0">
                                  <content>
                                     <Label fx:id="Announcement" alignment="CENTER" text="Announcement" textAlignment="CENTER">
+                                       <font>
+                                          <Font name="Monospaced Regular" size="14.0" />
+                                       </font>
+                                    </Label>
+                                 </content>
+                              </ScrollPane>
+                              <ScrollPane prefHeight="31.0" prefWidth="515.0">
+                                 <content>
+                                    <Label fx:id="ErrorField" alignment="CENTER" text="error" textAlignment="CENTER" textFill="RED">
                                        <font>
                                           <Font name="Monospaced Regular" size="14.0" />
                                        </font>

@@ -1,0 +1,8 @@
+AABDD
+ACBBD
+ECCFG
+EEFFG
+EEFFG
+
+Waktu pencarian: 129 ms
+Banyak kasus yang ditinjau: 26026
