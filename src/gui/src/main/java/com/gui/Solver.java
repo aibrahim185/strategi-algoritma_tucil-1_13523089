@@ -4,19 +4,28 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import java.util.Scanner;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.geometry.VPos;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Label;
-import javafx.scene.image.ImageView;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 
 public class Solver {
@@ -32,13 +41,15 @@ public class Solver {
     @FXML 
     private Label ErrorField;
     @FXML
-    private ImageView Image; 
+    private Canvas Image; 
     @FXML
     private TextArea PiecesField;
     @FXML
     private TextArea CustomField;
     @FXML
     private Button SolveButton;
+    @FXML
+    private Button SaveButton;
     
     FileChooser fc = new FileChooser();
 
@@ -330,37 +341,90 @@ public class Solver {
         return false;
     }
     
+    private void drawMatrixOnCanvas(Canvas canvas, char[][] board) {
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        int cellSize = 50;
+        int width = board[0].length * cellSize;
+        int height = board.length * cellSize;
+
+        canvas.setWidth(width);
+        canvas.setHeight(height);
+
+        Map<Character, Color> colorMap = new HashMap<>();
+        Random rand = new Random();
+        
+        for (char[] row : board) {
+            for (char c : row) {
+                if (c != EMPTY && c != PADDING && !colorMap.containsKey(c)) {
+                    colorMap.put(c, Color.color(rand.nextDouble(), rand.nextDouble(), rand.nextDouble()));
+                }
+            }
+        }
+
+        for (int y = 0; y < board.length; y++) {
+            for (int x = 0; x < board[0].length; x++) {
+                Color color;
+                if (board[y][x] == EMPTY) {
+                    color = Color.WHITE;
+                } else if (board[y][x] == PADDING) {
+                    color = Color.LIGHTGRAY;
+                } else {
+                    color = colorMap.get(board[y][x]);
+                }
+
+                gc.setFill(color);
+                gc.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+
+                gc.setStroke(Color.BLACK);
+                gc.setLineWidth(1);
+                gc.strokeRect(x * cellSize, y * cellSize, cellSize, cellSize);
+
+                if (board[y][x] != EMPTY && board[y][x] != PADDING) {
+                    gc.setFill(Color.BLACK);
+                    gc.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+                    gc.setTextAlign(TextAlignment.CENTER);
+                    gc.setTextBaseline(VPos.CENTER);
+
+                    double textX = (x * cellSize) + (cellSize / 2);
+                    double textY = (y * cellSize) + (cellSize / 2);
+                    gc.fillText(String.valueOf(board[y][x]), textX, textY);
+                }
+            }
+        }
+    }
+    
     @FXML 
     private void driver() {
         N = Integer.parseInt(NField.getText());
         M = Integer.parseInt(MField.getText());
         P = Integer.parseInt(PField.getText());
-
+    
         if (parse()) {
             System.out.println("Start\n");
             long startTime = System.currentTimeMillis();
             boolean isSolved = solve();
             long endTime = System.currentTimeMillis();
             long duration = endTime - startTime;
-
+    
             if (isSolved) {
+                SaveButton.setVisible(true);
                 printBoard(board);
+                drawMatrixOnCanvas(Image, board);
             } else {
-                printBoard(board);
                 System.out.println("Tidak ada solusi.");
             }
-
+    
             System.out.println("\nWaktu pencarian: " + duration + " ms");
             System.out.println("\nBanyak kasus yang ditinjau: " + totalIterations);
-            System.out.println("\nApakah anda ingin menyimpan solusi? (ya/tidak) ");
             totalIterations = 0;
         } else {
             System.out.println("error");
         }
-    }
+    }    
 
     @FXML
     private void inputFile() {
+        SaveButton.setVisible(false);   
         fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text Files", "*.txt"));
         File inputFile = fc.showOpenDialog(new Stage());
         if (inputFile != null) {
@@ -424,6 +488,7 @@ public class Solver {
         CaseField.setValue("DEFAULT");
     
         CustomField.setVisible(false);
+        SaveButton.setVisible(false);
     
         CaseField.setOnAction(e -> {
             String selectedCase = CaseField.getValue();
