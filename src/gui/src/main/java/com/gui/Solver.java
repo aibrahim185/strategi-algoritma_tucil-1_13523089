@@ -429,9 +429,14 @@ public class Solver {
         N = Integer.parseInt(NField.getText());
         M = Integer.parseInt(MField.getText());
         P = Integer.parseInt(PField.getText());
+
+        pieces.clear();
+        Announcement.setText("");
+        ErrorField.setText("");
     
         if (parse()) {
             System.out.println("Start\n");
+
             long startTime = System.currentTimeMillis();
             boolean isSolved = solve();
             long endTime = System.currentTimeMillis();
@@ -443,6 +448,7 @@ public class Solver {
                 createImage(Image, board);
                 Announcement.setText("Waktu pencarian: " + duration + " ms || Banyak kasus yang ditinjau: " + totalIterations);
             } else {
+                Announcement.setText("Tidak ada solusi.");
                 System.out.println("Tidak ada solusi.");
             }
     
