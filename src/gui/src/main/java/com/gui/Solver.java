@@ -1,14 +1,11 @@
 package com.gui;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
-
-import javax.imageio.ImageIO;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -17,7 +14,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -125,35 +121,182 @@ public class Solver {
         }
     }
     
-    // private void parse() {
-    //     if (selectedFile != null) {
-    //         BufferedImage img;
-    //         try {
-    //             img = ImageIO.read(selectedFile);
+    private boolean parse() {
+        try {
+            board = new char[N][M];
+            int totalArea = N * M;
+            for (int i = 0; i < N; i++) {
+                Arrays.fill(board[i], EMPTY);
+            }
 
-    //             double w = Double.parseDouble(widthField.getText());
-    //             double h = Double.parseDouble(heightField.getText());
+            String caseType = CaseField.getValue();
+            if (caseType.equals("CUSTOM")) {
+                totalArea = 0;
+                String[] customBoard = CustomField.getText().split("\n");
+                for (int i = 0; i < N; i++) {
+                    String line = customBoard[i];
 
-    //             // BufferedImage resizedImage = ImageProcessing.imageProcessing(img, w, h);
+                    for (int j = 0; j < M; j++) {
+                        if (line.charAt(j) == 'X') {
+                            board[i][j] = EMPTY;
+                            totalArea++;
+                        } else {
+                            board[i][j] = PADDING;
+                        }
+                    }
+                }
+            }
+
+            
+            String[] piecesData = PiecesField.getText().split("\n");
+            List<int[]> shapeList = new ArrayList<>();
+            int area = 0;
+            int idx = 0;
+            for (int i = 0; i < P; i++) {
+                String line = piecesData[idx];
+
+                char symbol = (char) (i + 'A');
+                for (int j = 0; j < line.length(); j++) {
+                    if (line.charAt(j) >= 'A' && line.charAt(j) <= 'Z') {
+                        symbol = line.charAt(j);
+                        break;
+                    }
+                }
                 
-    //             File output = new File("test/image/hasil/hasil_" + selectedFile.getName());
-    //             output.getParentFile().mkdirs();
-    //             // ImageIO.write(resizedImage, "jpg", output); 
-    //             Image resultImage = new Image(output.toURI().toString());
-    //             // afterImage.setImage(resultImage);
-    //         } catch (IOException e) {
-    //             e.printStackTrace();
-    //         } catch (NumberFormatException e) {
-    //             System.out.println("Input tidak valid untuk lebar/tinggi.");
-    //         }
-    //     }
-    // }
+                int row = 0;
+                readPiece:
+                do {
+                    boolean isFirst = true;
 
+                    for (int col = 0; col < line.length(); col++) {
+                        if (line.charAt(col) == symbol) {
+                            isFirst = false;
+                            shapeList.add(new int[]{row, col});
+                            area++;
+                        } else if (line.charAt(col) >= 'A' && line.charAt(col) <= 'Z' && isFirst) {
+                            break readPiece;
+                        } else if (line.charAt(col) != ' ') {
+                            ErrorField.setText("Karakter tidak valid.");
+                            return false;
+                        } 
+                    }
+                    row++;
+                } while (idx++ < piecesData.length);
+
+                int[][] shape = shapeList.toArray(new int[0][]);
+                pieces.add(new Piece(symbol, shape));
+            }
+
+            if (area != totalArea) {
+                ErrorField.setText("Jumlah area tidak sesuai.");
+                return false;
+            }
+
+            return true;
+        } catch (Exception e) {
+            ErrorField.setText("Error: " + e.getMessage());
+        }
+        return false;
+    }
+
+    private static boolean nextTransformation(int[] trans) {
+        int i = trans.length - 1;
+        while (i >= 0) {
+            if (trans[i] < 7) {
+                trans[i]++;
+                return true;
+            }
+            trans[i] = 0;
+            i--;
+        }
+        return false;
+    }
+
+    private static boolean place(char[][] localBoard, Piece piece, int row, int col) {
+        for (int[] coord : piece.shape) {
+            int r = row + coord[0];
+            int c = col + coord[1];
+            if (r < 0 || r >= N || c < 0 || c >= M || localBoard[r][c] != EMPTY) {
+                return false;
+            }
+        }
+        for (int[] coord : piece.shape) {
+            localBoard[row + coord[0]][col + coord[1]] = piece.symbol;
+        }
+        return true;
+    }
+    
+    private static void removePiece(char[][] localBoard, Piece piece, int row, int col) {
+        for (int[] coord : piece.shape) {
+            int r = row + coord[0];
+            int c = col + coord[1];
+            if (r < 0 || r >= N || c < 0 || c >= M || localBoard[r][c] == PADDING) {
+                continue;
+            }
+            if (localBoard[r][c] == piece.symbol) {
+                localBoard[r][c] = EMPTY;
+            }
+        }
+    }
+    
+    private static void printBoard(char[][] localBoard) {
+        String[] style = {
+            "",
+            "\u001B[1m",
+            "\u001B[3m",
+            "\u001B[1;3m", 
+        };
+    
+        String[] backgrounds = {
+            "\u001B[41m", 
+            "\u001B[42m", 
+            "\u001B[43m", 
+            "\u001B[44m", 
+            "\u001B[45m", 
+            "\u001B[46m",
+            "\u001B[101m", 
+            "\u001B[102m", 
+            "\u001B[103m", 
+            "\u001B[104m", 
+            "\u001B[105m", 
+            "\u001B[106m", 
+            "\u001B[107m"
+        };
+    
+        String reset = "\u001B[0m";
+        
+        for (char[] row : localBoard) {
+            for (char cell : row) {
+                if (cell >= 'A' && cell <= 'Z') {
+                    String color = style[(cell - 'A') / 12] + backgrounds[(cell - 'A') % 12];
+                    System.out.print(color + cell + reset);
+                } else {
+                    System.out.print(cell);
+                }
+            }
+            System.out.println();
+        }
+    }
+    
+    private static boolean check(char[][] localBoard) {
+        for (char[] row : localBoard) {
+            for (char cell : row) {
+                if (cell == EMPTY) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    
     @FXML 
     private void driver() {
         N = Integer.parseInt(NField.getText());
         M = Integer.parseInt(MField.getText());
         P = Integer.parseInt(PField.getText());
+
+        if (parse()) {
+        }
     }
 
     @FXML
@@ -180,13 +323,12 @@ public class Solver {
                                 if (c != 'X' && c != '.') {
                                     System.out.print(c);
                                     ErrorField.setText("Karakter tidak valid.");
-                                    // return;
+                                    return;
                                 }
                             }
                         }
                         CaseField.setValue("CUSTOM");
                         CustomField.setText(customBoard.toString());
-                        // CustomField.setVisible(true);
                     }
                 }
                 
