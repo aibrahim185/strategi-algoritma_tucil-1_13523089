@@ -448,14 +448,16 @@ public class Solver {
                 createImage(Image, board);
                 Announcement.setText("Waktu pencarian: " + duration + " ms || Banyak kasus yang ditinjau: " + totalIterations);
             } else {
+                Image.getGraphicsContext2D().clearRect(0, 0, Image.getWidth(), Image.getHeight());
                 Announcement.setText("Tidak ada solusi.");
                 System.out.println("Tidak ada solusi.");
             }
-    
+            
             System.out.println("\nWaktu pencarian: " + duration + " ms");
             System.out.println("\nBanyak kasus yang ditinjau: " + totalIterations);
             totalIterations = 0;
         } else {
+            Image.getGraphicsContext2D().clearRect(0, 0, Image.getWidth(), Image.getHeight());
             System.out.println("error");
         }
     }    
