@@ -1,0 +1,8 @@
+...A...
+.AAABB.
+CCCCBBB
+.CDEEE.
+...E...
+
+Waktu pencarian: 3389 ms
+Banyak kasus yang ditinjau: 573441
